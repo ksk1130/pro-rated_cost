@@ -18,21 +18,21 @@
         <div class="mb-3 row">
             <label for="total" class="col-sm-2 col-form-label">合計金額：</label>
             <div class="col-sm-4">
-              <input type="text" class="form-control" id="total" placeholder="合計金額を入力してください" v-on:blur="addComma(event)" v-on:focus="deleteComma(event)">
+              <input type="text" class="form-control text-end" id="total" pattern="^\d+$" title="hoge" required autofocus placeholder="合計金額を入力してください" v-on:blur="addComma(event)" v-on:focus="deleteComma(event)">
             </div>
         </div>
 
         <div class="mb-3 row">
             <label for="vol" class="col-sm-2 col-form-label">利用回数：</label>
             <div class="col-sm-4">
-                <input type="text" class="form-control" id="count" placeholder="利用回数を入力してください" v-on:blur="addComma(event)" v-on:focus="deleteComma(event)">
+                <input type="text" class="form-control text-end" id="count" pattern="^\d+$" required placeholder="利用回数を入力してください" v-on:blur="addComma(event)" v-on:focus="deleteComma(event)">
             </div>
         </div>
 
         <div class="mb-3 row">
             <label for="result" class="col-sm-2 col-form-label">1日あたりの費用(円/回)：</label>
             <div class="col-sm-4">
-                <input type="text" class="form-control" id="result" placeholder="計算結果" readonly v-on:blur="calc()" v-on:focus="calc()">
+                <input type="text" class="form-control text-end" id="result" placeholder="計算結果" readonly v-on:focus="calc()">
             </div>
         </div>
 
@@ -52,14 +52,34 @@
                     if(e.target.value === "") {
                         return;
                     }
-                    const separatedValue = Number(e.target.value).toLocaleString();
-                    e.target.value = separatedValue;
+
+                    const numericValue = Number(e.target.value.replace(/,/g, ''));
+
+                    // numericValueがNaNの場合は空文字にする
+                    if(isNaN(numericValue)) {
+                        e.target.value = "";
+                        return;
+                    }
+
+                    e.target.value = numericValue.toLocaleString();
                 },
                 // totalがフォーカスされたらカンマを削除する 10,000 -> 10000
                 deleteComma: function(e) {
                     console.log(e.target.type + " " + e.target.value);
-                    const separatedValue = e.target.value.replace(/,/g, '');
-                    e.target.value = separatedValue;
+
+                    // 空文字の場合は何もしない
+                    if(e.target.value === "") {
+                        return;
+                    }
+
+                    const numericValue = Number(e.target.value.replace(/,/g, ''));
+                    // numericValueがNaNの場合は空文字にする
+                    if(isNaN(numericValue)) {
+                        e.target.value = "";
+                        return;
+                    }
+
+                    e.target.value = numericValue;
                 },
                 // 計算
                 calc: function() {
@@ -67,10 +87,10 @@
                     const count = document.getElementById('count').value.replace(/,/g, '');
                     const result = document.getElementById('result');
                     if(total === "" || count === "") {
-                        alert("合計金額と利用回数を入力してください");
+                        result.value = "合計金額と利用回数を入力してください";
                         return;
                     }
-                    result.value = Math.floor(total / count);
+                    result.value = Math.floor(total / count).toLocaleString();
                 }
             }
         });
