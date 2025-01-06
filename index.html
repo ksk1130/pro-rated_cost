@@ -10,38 +10,70 @@
 <body>
     <div class="container-fluid">
         <!-- Content here -->
-        <h1>日割り計算</h1>
-        <p>1日あたりの費用を計算します。</p> 
-        
-        <br>
+        <div class="mb-3 row">
+             <h1>日割り計算</h1>
+             <p>1日あたりの費用を計算します。</p>      
+        </div>
 
         <div class="mb-3 row">
             <label for="total" class="col-sm-2 col-form-label">合計金額：</label>
-            <div class="col-sm-10">
-              <input type="number" class="form-control" id="total" placeholder="合計金額を入力してください" onfocusout="addComma(event)">
+            <div class="col-sm-4">
+              <input type="text" class="form-control" id="total" placeholder="合計金額を入力してください" v-on:blur="addComma(event)" v-on:focus="deleteComma(event)">
             </div>
-          </div>
-          <div class="mb-3 row">
+        </div>
+
+        <div class="mb-3 row">
             <label for="vol" class="col-sm-2 col-form-label">利用回数：</label>
-            <div class="col-sm-10">
-              <input type="number" class="form-control" id="vol" placeholder="利用回数を入力してください">
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="count" placeholder="利用回数を入力してください" v-on:blur="addComma(event)" v-on:focus="deleteComma(event)">
             </div>
-          </div>
+        </div>
+
+        <div class="mb-3 row">
+            <label for="result" class="col-sm-2 col-form-label">1日あたりの費用(円/回)：</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="result" placeholder="計算結果" readonly v-on:blur="calc()" v-on:focus="calc()">
+            </div>
+        </div>
+
     </div>
 
     <!-- Vue.js -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script type="text/javascript">
-        // totalがフォーカスアウトされたらカンマ区切りにする 10000 -> 10,000
-        document.getElementById('total').addEventListener('focusout', addComma);
+        new Vue({
+            el: '.container-fluid',
+            methods: {
+                // totalがフォーカスアウトされたらカンマ区切りにする 10000 -> 10,000
+                addComma: function(e) {
+                    console.log(e.target.type + " " + e.target.value);
 
-        function addComma(e) {
-            console.log(e.target.type + " " + e.target.value);
-            const separatedValue = Number(e.target.value).toLocaleString();
-            // eのタイプをtextに変更
-            e.target.type = 'text';
-            e.target.value = separatedValue;
-        }
+                    // 空文字の場合は何もしない
+                    if(e.target.value === "") {
+                        return;
+                    }
+                    const separatedValue = Number(e.target.value).toLocaleString();
+                    e.target.value = separatedValue;
+                },
+                // totalがフォーカスされたらカンマを削除する 10,000 -> 10000
+                deleteComma: function(e) {
+                    console.log(e.target.type + " " + e.target.value);
+                    const separatedValue = e.target.value.replace(/,/g, '');
+                    e.target.value = separatedValue;
+                },
+                // 計算
+                calc: function() {
+                    const total = document.getElementById('total').value.replace(/,/g, '');
+                    const count = document.getElementById('count').value.replace(/,/g, '');
+                    const result = document.getElementById('result');
+                    if(total === "" || count === "") {
+                        alert("合計金額と利用回数を入力してください");
+                        return;
+                    }
+                    result.value = Math.floor(total / count);
+                }
+            }
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </html>
